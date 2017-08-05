@@ -1,13 +1,18 @@
 import { toggleActionButton } from './scripts'
 
 export let status
-const timeInfo = document.getElementById('timeInfo')
 const canvas = document.getElementById('timer')
-const context = canvas.getContext('2d')
-const start = 4.72
-const centerWidth = context.canvas.width / 2
-const centerHeight = context.canvas.height / 2
+const canvasSize = 640
+canvas.width = canvasSize * 2
+canvas.height = canvasSize * 2
+canvas.style.width = `${canvasSize}px`
+canvas.style.height = `${canvasSize}px`
 
+const context = canvas.getContext('2d')
+context.scale(2, 2)
+const start = 4.72
+const centerWidth = canvasSize / 2
+const centerHeight = canvasSize / 2
 const arcWidth = 140
 let mainTime
 let shortTime
@@ -47,7 +52,7 @@ function progressBar (mainTime, shortTime, longTime) {
   }
 
   diff = (elapsedSeconds / timeLength) * Math.PI * 2
-  context.clearRect(0, 0, 320, 320)
+  context.clearRect(0, 0, 640, 640)
   context.beginPath()
   context.lineWidth = 30
   context.arc(centerWidth, centerHeight, arcWidth, 0, 2 * Math.PI, false)
@@ -60,7 +65,7 @@ function progressBar (mainTime, shortTime, longTime) {
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.lineWidth = 30
-  context.font = '4em monospace'
+  context.font = '5em monospace'
   context.beginPath()
   context.arc(centerWidth, centerHeight, arcWidth, start, diff + start, false)
   context.stroke()
@@ -124,7 +129,6 @@ const timer = {
 }
 
 document.addEventListener('cycle', () => {
-  console.log(count)
   window.setTimeout(timer.reset, 500)
   window.setTimeout(timer.toggle, 500)
 })
