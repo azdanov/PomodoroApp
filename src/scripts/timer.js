@@ -1,31 +1,62 @@
-let canvas = document.getElementById('timer')
-let context = canvas.getContext('2d')
-let elapsedSeconds = 0
-let start = 4.72
-let centerWidth = context.canvas.width / 2
-let centerHeight = context.canvas.height / 2
-let arcWidth = 140
+import { toggleActionButton } from './scripts'
+
+export let status
+const timeInfo = document.getElementById('timeInfo')
+const canvas = document.getElementById('timer')
+const context = canvas.getContext('2d')
+const start = 4.72
+const centerWidth = context.canvas.width / 2
+const centerHeight = context.canvas.height / 2
+
+const arcWidth = 140
+let mainTime
+let shortTime
+let longTime
 let diff
 let bar
-export let status
-let timeMemory
 
-function formatTime (seconds) {
-  return new Date(seconds * 1000).toISOString().substr(11, 8)
+let elapsedSeconds = 0
+let count = 1
+const colors = {
+  active: {
+    secondaryColor: '#7986cb',
+    mainColor: '#37474f',
+    backgroundColor: '#eceff1'
+  },
+  break: {
+    secondaryColor: '#37474f',
+    mainColor: '#7986cb',
+    backgroundColor: '#eceff1'
+  }
 }
 
-function progressBar (timeLength) {
+const cycleEvent = new Event('cycle')
+
+function formatTime (seconds) {
+  return new Date(seconds * 1000).toISOString().substr(14, 5)
+}
+
+function progressBar (mainTime, shortTime, longTime) {
+  let timeLength
+  if (count === 4) {
+    timeLength = longTime
+  } else if (count % 2 === 1) {
+    timeLength = mainTime
+  } else {
+    timeLength = shortTime
+  }
+
   diff = (elapsedSeconds / timeLength) * Math.PI * 2
   context.clearRect(0, 0, 320, 320)
   context.beginPath()
   context.lineWidth = 30
   context.arc(centerWidth, centerHeight, arcWidth, 0, 2 * Math.PI, false)
-  context.fillStyle = '#ECEFF1'
+  context.fillStyle = colors.active.backgroundColor
   context.fill()
-  context.strokeStyle = '#7986cb'
+  context.strokeStyle = count % 2 === 1 ? colors.active.secondaryColor : colors.break.secondaryColor
   context.stroke()
-  context.fillStyle = '#37474f'
-  context.strokeStyle = '#37474f'
+  context.fillStyle = colors.active.mainColor
+  context.strokeStyle = count % 2 === 1 ? colors.active.mainColor : colors.break.mainColor
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.lineWidth = 30
@@ -34,37 +65,68 @@ function progressBar (timeLength) {
   context.arc(centerWidth, centerHeight, arcWidth, start, diff + start, false)
   context.stroke()
 
-  context.fillText(formatTime(elapsedSeconds), centerWidth, centerHeight)
+  context.fillText(formatTime(timeLength - elapsedSeconds), centerWidth, centerHeight)
 
   if (elapsedSeconds >= timeLength) {
     clearTimeout(bar)
-    status = 'done'
-  }
 
+    status = 'done'
+
+    if (++count === 5) {
+      count = 1
+    }
+
+    document.dispatchEvent(cycleEvent)
+  }
   elapsedSeconds++
 }
 
+export function updateTimes () {
+  mainTime = document.getElementById('mainTime').value * 60
+  shortTime = document.getElementById('shortTime').value * 60
+  longTime = document.getElementById('longTime').value * 60
+}
+
+export function resetTimes () {
+  mainTime = 25 * 60
+  shortTime = 5 * 60
+  longTime = 10 * 60
+}
+
 const timer = {
-  start (timeLength) {
-    timeMemory = timeLength
+  start () {
+    updateTimes()
     status = 'on'
-    bar = setInterval(progressBar.bind(null, timeMemory), 50)
+    progressBar(mainTime, shortTime, longTime)
+    bar = setInterval(progressBar.bind(null, mainTime, shortTime, longTime), 1000)
   },
   toggle () {
+    toggleActionButton()
+
     if (status === 'on') {
       clearTimeout(bar)
       status = 'off'
     } else if (status === 'off') {
-      bar = setInterval(progressBar.bind(null, timeMemory), 50)
+      progressBar(mainTime, shortTime, longTime)
+      bar = setInterval(progressBar.bind(null, mainTime, shortTime, longTime), 1000)
       status = 'on'
     }
   },
   reset () {
     clearTimeout(bar)
     elapsedSeconds = 0
-    status = 'on'
-    bar = setInterval(progressBar.bind(null, timeMemory), 50)
+    if (status === 'on') {
+      toggleActionButton()
+    }
+    status = 'off'
+    progressBar(mainTime, shortTime, longTime)
   }
 }
+
+document.addEventListener('cycle', () => {
+  console.log(count)
+  window.setTimeout(timer.reset, 500)
+  window.setTimeout(timer.toggle, 500)
+})
 
 export default timer

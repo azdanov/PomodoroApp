@@ -5,17 +5,82 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="shortcut icon"type="image/x-icon" href="data:image/x-icon;,">
+  <link rel="shortcut icon" type="image/x-icon" href="data:image/x-icon;,">
   <title>Pomodoro App</title>
 </head>
 <body>
 
 <main>
-  <div class="settings" tabindex="3"><span class="icon-cog"></span></div>
-  <div class="reset" tabindex="2"><span class="icon-reset"></span></div>
+  <div class="settings" id="open-button" tabindex="3"><span class="icon-cog" hidden></span></div>
+  <div class="reset" tabindex="2"><span class="icon-reset" hidden></span></div>
   <canvas id="timer" width="320" height="320"></canvas>
-  <div class="action" tabindex="1"><span class="icon-play"></span></div>
+  <div class="action" tabindex="1"><span class="icon-play" hidden></span></div>
 </main>
+
+<div class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div class="box">
+      <h2 class="subtitle is-3">Settings</h2>
+      <label class="label" for="mainTime">Pomodoro Time</label>
+      <div class="field has-addons">
+        <p class="control">
+          <input class="input" id="mainTime" type="number" placeholder="25" value="25">
+        </p>
+        <p class="control">
+          <a class="button is-static">
+            minutes
+          </a>
+        </p>
+      </div>
+      <label class="label" for="shortTime">Short Break</label>
+      <div class="field has-addons">
+        <p class="control">
+          <input class="input" id="shortTime" type="number" placeholder="5" value="5">
+        </p>
+        <p class="control">
+          <a class="button is-static">
+            minutes
+          </a>
+        </p>
+      </div>
+      <label class="label" for="longTime">Long Break</label>
+      <div class="field has-addons">
+        <p class="control">
+          <input class="input" id="longTime" type="number" placeholder="10" value="10">
+        </p>
+        <p class="control">
+          <a class="button is-static">
+            minutes
+          </a>
+        </p>
+      </div>
+      <div class="field is-clearfix">
+        <p class="control is-pulled-left">
+          <a id="save" class="button is-success is-inverted">
+            <span class="icon"><i class="icon-checkmark"></i></span>
+            <span>Save</span>
+          </a>
+        </p>
+        <p class="control is-pulled-right">
+          <a id="reset" class="button is-danger is-inverted">
+            <span class="icon"><i class="icon-cross"></i></span>
+            <span>Reset</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <button class="modal-close is-large"></button>
+</div>
 
 </body>
 </html>
+
+<!--
+
+
+
+
+
+-->

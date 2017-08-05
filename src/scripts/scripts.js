@@ -1,28 +1,20 @@
 import timer, {status} from './timer.js'
 import appendFavicon from './favicon'
+import setupModal from './modal'
 
 const actionButton = document.querySelector('.action [class^=\'icon\']')
 const resetButton = document.querySelector('.icon-reset')
 const settingsButton = document.querySelector('.icon-cog')
-const fiveMinutes = 300
-const twentyFiveMinutes = 1500
 
 Array.from(document.querySelectorAll('[class^=\'icon\']'))
   .forEach((item) => item.addEventListener('click', event => event.target.parentNode.blur()))
 
-const toggleActionButton = (event) => {
-  if (status === undefined) {
-
-  }
-  if (event.currentTarget.classList.toString() === 'icon-reset') {
-    if (actionButton.classList.toString() === 'icon-play') {
-      actionButton.classList.remove('icon-play')
-      actionButton.classList.add('icon-pause')
-    }
+export const toggleActionButton = () => {
+  if (status === 'done') {
     return
   }
 
-  if (actionButton.classList.toString() === 'icon-pause') {
+  if (status === 'on') {
     actionButton.classList.remove('icon-pause')
     actionButton.classList.add('icon-play')
   } else {
@@ -31,16 +23,24 @@ const toggleActionButton = (event) => {
   }
 }
 
-actionButton.addEventListener('click', toggleActionButton)
-resetButton.addEventListener('click', toggleActionButton)
-
 actionButton.addEventListener('click', timer.toggle)
+settingsButton.addEventListener('click', () => {
+  if (status === 'on') {
+    timer.toggle()
+    settingsButton.dataset.timerStatus = 'onHold'
+  }
+})
+
 resetButton.addEventListener('click', timer.reset)
 
 // Display timer
-timer.start(fiveMinutes)
+timer.start()
 window.setTimeout(() => {
   timer.toggle()
+  actionButton.removeAttribute('hidden')
+  resetButton.removeAttribute('hidden')
+  settingsButton.removeAttribute('hidden')
 }, 50)
 
 appendFavicon()
+setupModal()
